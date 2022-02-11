@@ -1,0 +1,33 @@
+external_data_config:
+  external_data_csv: data/external/train.csv
+
+raw_data_config: 
+  raw_data_csv: data/raw/train.csv
+  model_var: ['DEPT', 'ASP', 'Facies_IPSOM_IPSOM', 'GR', 'LLD', 'PHIE', 'TNPH', 'VSH_GR', 'WELL']
+  train_test_split_ratio: 0.2
+  target: Facies_IPSOM_IPSOM 
+  random_state: 111
+  new_train_data_csv: data/external/train_new.csv
+
+processed_data_config:
+  train_data_csv: data/processed/churn_train.csv
+  test_data_csv:  data/processed/churn_test.csv
+
+mlflow_config:
+  artifacts_dir: artifacts
+  experiment_name: model_iteration1
+  run_name: xgboost
+  registered_model_name: xgboost_model
+  remote_server_uri: http://localhost:1234
+ 
+xgboost: 
+  max_depth: 15
+  n_estimators: 100
+
+model_dir: models/model.joblib
+
+model_webapp_dir: webapp/model_webapp_dir/model.joblib
+
+model_monitor:
+  target_col_name: target
+  monitor_dashboard_html: reports/data_and_target_drift_dashboard.html
