@@ -22,7 +22,7 @@ mlflow_config:
  
 xgboost: 
   max_depth: 15
-  n_estimators: 100
+  n_estimators: 150
 
 model_dir: models/model.joblib
 

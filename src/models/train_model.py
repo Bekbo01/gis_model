@@ -6,8 +6,10 @@ import pandas as pd
 from urllib.parse import urlparse
 from sklearn.metrics import f1_score,recall_score,accuracy_score,precision_score,confusion_matrix,classification_report
 from sklearn.metrics import *
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor, XGBClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 
 def read_params(config_path):
     """
@@ -95,6 +97,7 @@ def train_and_evaluate(config_path):
         y_pred = model.predict(test_x)
         (rmse, mae, r2) = eval_metrics(test_y, y_pred)
         """
+        """
         paramters = {"n_estimators"   :[10,15,25,50,100,150],
              "max_depth"      :[3,5,7,10],
              "loss"           :["ls", "lad"]
@@ -105,9 +108,27 @@ def train_and_evaluate(config_path):
                             scoring="r2",
                             cv=5,
                             n_jobs=-1)
-
+        """
+        pipe_steps = [
+            ('scaler', MinMaxScaler()),
+            ('XGBClassifier', XGBClassifier(base_score=0.5, booster='gbtree',
+                                colsample_bylevel=1, colsample_bynode=1,
+                                colsample_bytree=1, eval_metric='mlogloss',
+                                gamma=0, gpu_id=-1, importance_type='gain',
+                                interaction_constraints='', learning_rate=0.3,
+                                max_delta_step=0, max_depth=max_depth,
+                                min_child_weight=1,
+                                monotone_constraints='()', n_estimators=n_estimators,
+                                n_jobs=-1, num_parallel_tree=1,
+                                objective='multi:softprob', random_state=42,
+                                reg_alpha=0.2, reg_lambda=1,
+                                scale_pos_weight=None, subsample=0.8,
+                                tree_method='exact', validate_parameters=1,
+                                verbosity=None))
+            ]
+        model = Pipeline(pipe_steps)
         # perform the grid search
-        model = grid.fit(train_x, train_y)
+        model.fit(train_x, train_y)
         y_pred = model.predict(test_x)
         r2 = r2_score(test_y, y_pred)
         mse = mean_squared_error(test_y, y_pred) 
@@ -136,3 +157,4 @@ if __name__=="__main__":
     args.add_argument("--config", default="params.yaml")
     parsed_args = args.parse_args()
     train_and_evaluate(config_path=parsed_args.config)
+
